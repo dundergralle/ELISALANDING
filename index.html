@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f5f0e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Luna</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --warm: #ede5d8;
+    --sand: #d9cfc0;
+    --stone: #b8a898;
+    --taupe: #8a7a6a;
+    --dark: #3d3530;
+    --accent: #c9b99a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { height: 100%; }
+
+  body {
+    min-height: 100dvh;
+    font-family: 'Jost', sans-serif;
+    background: var(--cream);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Soft linen texture via layered gradients */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, #fff9f2 0%, transparent 65%),
+      radial-gradient(ellipse 70% 50% at 10% 80%, #ede5d8 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 90% 60%, #e8dfd2 0%, transparent 55%),
+      var(--cream);
+  }
+
+  /* Very subtle grain */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+
+  /* Floating soft blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: blob-drift ease-in-out infinite;
+  }
+  @keyframes blob-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(15px, -20px) scale(1.04); }
+    66%       { transform: translate(-10px, 10px) scale(0.97); }
+  }
+
+  .content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 3rem 1.5rem;
+    padding-top: max(3rem, env(safe-area-inset-top));
+    padding-bottom: max(3rem, env(safe-area-inset-bottom));
+  }
+
+  /* ---- AVATAR ---- */
+  .avatar-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin-bottom: 1.4rem;
+  }
+
+  /* Soft glowing ring */
+  .avatar-ring {
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: conic-gradient(
+      #e8ddd0, #d4c8b8, #f0e8dc, #c8bfb0, #e8ddd0, #d4c8b8, #f0e8dc
+    );
+    animation: ring-turn 8s linear infinite;
+    opacity: 0.8;
+  }
+  @keyframes ring-turn { to { transform: rotate(360deg); } }
+
+  .avatar-ring-inner {
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--cream);
+    z-index: 1;
+  }
+
+  .avatar {
+    position: absolute;
+    inset: 5px;
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    border-radius: 50%;
+    object-fit: cover;
+    z-index: 2;
+    display: block;
+  }
+
+  /* ---- NAME ---- */
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 3rem;
+    color: var(--dark);
+    letter-spacing: 0.06em;
+    margin-bottom: 0.1rem;
+    text-align: center;
+  }
+
+  .name-sub {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.68rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  /* Thin decorative line */
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sand), transparent);
+    margin: 0 auto 1rem;
+  }
+
+  /* ---- LOCATION ---- */
+  .location-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.7rem;
+    color: var(--stone);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.8rem;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a8c8a0;
+    flex-shrink: 0;
+    box-shadow: 0 0 5px #a8c8a0;
+    animation: dot-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  /* ---- BUTTONS ---- */
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 50px;
+    padding: 0 1.2rem;
+    border-radius: 50px;
+    background: rgba(255, 252, 248, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--taupe);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid rgba(200, 185, 168, 0.55);
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+    box-shadow:
+      0 2px 16px rgba(180, 160, 140, 0.12),
+      0 1px 4px rgba(160, 140, 120, 0.08);
+  }
+
+  /* Shimmer sweep */
+  .btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.5s ease;
+    pointer-events: none;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    background: rgba(210, 195, 178, 0.35);
+    border-color: rgba(180, 165, 148, 0.7);
+    color: var(--dark);
+    font-weight: 300;
+  }
+
+  @media (hover: hover) {
+    .btn:hover {
+      background: rgba(255, 252, 248, 0.92);
+      border-color: rgba(200, 185, 168, 0.8);
+      transform: translateY(-1px);
+    }
+    .btn:hover::after { left: 140%; }
+  }
+
+  .btn:active {
+    background: rgba(240, 235, 228, 0.9);
+    transform: scale(0.98);
+  }
+
+  /* ---- FOOTER DECO ---- */
+  .footer-deco {
+    margin-top: 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 0.75rem;
+    color: var(--sand);
+    letter-spacing: 0.1em;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<script>
+var path = window.location.pathname.replace(/\/$/, '');
+if (path === '/link') {
+  window.location.replace('https://onlyfans.com/aliciapearl/c7');
+}
+</script>
+
+<div class="bg"></div>
+<div class="grain"></div>
+
+<!-- Soft background blobs -->
+<div class="blob" style="width:320px;height:320px;top:-80px;left:-80px;background:radial-gradient(circle,rgba(237,229,216,0.5),transparent 70%);animation-duration:14s;"></div>
+<div class="blob" style="width:280px;height:280px;bottom:-60px;right:-60px;background:radial-gradient(circle,rgba(225,215,200,0.45),transparent 70%);animation-duration:18s;animation-delay:3s;"></div>
+<div class="blob" style="width:200px;height:200px;top:40%;left:-40px;background:radial-gradient(circle,rgba(245,238,228,0.4),transparent 70%);animation-duration:22s;animation-delay:7s;"></div>
+
+<div class="content">
+
+  <div class="avatar-wrap">
+    <div class="avatar-ring"></div>
+    <div class="avatar-ring-inner"></div>
+    <img class="avatar" src="https://github.com/dundergralle/ALICIALANDING/blob/main/photo_2026-04-29_18-34-42.jpg?raw=true" alt="Luna">
+  </div>
+
+  <h1>Luna</h1>
+  <p class="name-sub">&#8226; din tjej &#8226;</p>
+  <div class="divider"></div>
+
+  <div class="location-text">
+    <span class="dot"></span>
+    <span id="loc-text"></span>
+  </div>
+
+  <div class="buttons">
+    <a class="btn btn-primary" href="/link" target="_blank">hemliga sidan</a>
+    <a class="btn" href="https://www.instagram.com/aliciapearl0">instagram</a>
+    <a class="btn" href="https://x.com/aliciapearl0">twitter / x</a>
+  </div>
+
+  <p class="footer-deco">that girl era ✦</p>
+</div>
+
+<script>
+(function() {
+  var fallbacks = [
+    "Stockholm","Göteborg","Malmö","Uppsala","Linköping","Örebro","Västerås",
+    "Helsingborg","Norrköping","Jönköping","Umeå","Lund","Gävle","Borås","Sundsvall",
+    "Oslo","Bergen","Trondheim","Stavanger","Drammen","Kristiansand","Tromsø","Ålesund"
+  ];
+  function setCity(city) {
+    var c = (city && city.trim().length > 1) ? city.trim() : fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    document.getElementById('loc-text').textContent = '5 minutes ago in: ' + c;
+  }
+  function get(url, extract) {
+    return fetch(url, { cache: 'no-store' }).then(function(r) { return r.json(); }).then(function(d) {
+      var v = extract(d);
+      if (!v || v.trim().length < 2) throw new Error('no city');
+      return v;
+    });
+  }
+  get('https://ipinfo.io/json', function(d) { return d && d.city; })
+    .catch(function() { return get('https://ip-api.com/json/?fields=city,regionName', function(d) { return d && (d.city || d.regionName); }); })
+    .catch(function() { return get('https://ipapi.co/json/', function(d) { return d && (d.city || d.region); }); })
+    .then(function(city) { setCity(city); })
+    .catch(function() { setCity(null); });
+})();
+</script>
+</body>
+</html>
